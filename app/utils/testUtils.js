@@ -9,6 +9,7 @@ import configureStore from '@app/configureStore';
 import { DEFAULT_LOCALE, translationMessages } from '@app/i18n';
 import ConnectedLanguageProvider from '@containers/LanguageProvider';
 import { theme } from '@containers/App';
+import { ThemeProvider as CustomThemeProvider } from '@app/contexts/themeContext';
 
 export const renderWithIntl = (children) => {
   i18n.loadLocaleData(DEFAULT_LOCALE, { plurals: DEFAULT_LOCALE });
@@ -23,7 +24,9 @@ export const renderProvider = (children, history) => {
     <Provider store={store}>
       <ConnectedLanguageProvider messages={translationMessages}>
         <ThemeProvider theme={theme}>
-          {history ? <Router history={history}>{children}</Router> : <BrowserRouter>{children}</BrowserRouter>}
+          <CustomThemeProvider>
+            {history ? <Router history={history}>{children}</Router> : <BrowserRouter>{children}</BrowserRouter>}
+          </CustomThemeProvider>
         </ThemeProvider>
       </ConnectedLanguageProvider>
     </Provider>

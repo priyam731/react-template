@@ -30,6 +30,8 @@ import history from '@utils/history';
 import { SCREEN_BREAK_POINTS } from '@utils/constants';
 import configureStore from '@app/configureStore';
 import { colors } from '@themes';
+import { ThemeProvider } from '@app/contexts/themeContext';
+import { DarkModeToggle } from '@app/components/DarkModeToggle';
 
 export const theme = createTheme({
   palette: {
@@ -75,36 +77,42 @@ export function App() {
             <ErrorBoundary>
               <Provider store={store}>
                 <ConnectedLanguageProvider messages={translationMessages}>
-                  <StyledEngineProvider injectFirst>
-                    <MUIThemeProvider theme={theme}>
-                      <CssBaseline />
-                      <Global styles={globalStyles} />
-                      <Header />
-                      <Container>
-                        <For
-                          ParentComponent={(props) => <Switch {...props} />}
-                          of={map(Object.keys(routeConfig))}
-                          renderItem={(routeKey, index) => {
-                            const Component = routeConfig[routeKey].component;
-                            return (
-                              <Route
-                                exact={routeConfig[routeKey].exact}
-                                key={index}
-                                path={routeConfig[routeKey].route}
-                                render={(props) => {
-                                  const updatedProps = {
-                                    ...props,
-                                    ...routeConfig[routeKey].props
-                                  };
-                                  return <Component {...updatedProps} />;
-                                }}
-                              />
-                            );
-                          }}
-                        />
-                      </Container>
-                    </MUIThemeProvider>
-                  </StyledEngineProvider>
+                  <ThemeProvider>
+                    <StyledEngineProvider injectFirst>
+                      <MUIThemeProvider theme={theme}>
+                        <CssBaseline />
+                        <Global styles={globalStyles} />
+                        <Header />
+                        <Container>
+                          <For
+                            ParentComponent={(props) => <Switch {...props} />}
+                            of={map(Object.keys(routeConfig))}
+                            renderItem={(routeKey, index) => {
+                              // eslint-disable-next-line security/detect-object-injection
+                              const Component = routeConfig[routeKey].component;
+                              return (
+                                <Route
+                                  exact={routeConfig[routeKey].exact}
+                                  key={index}
+                                  // eslint-disable-next-line security/detect-object-injection
+                                  path={routeConfig[routeKey].route}
+                                  render={(props) => {
+                                    const updatedProps = {
+                                      ...props,
+                                      // eslint-disable-next-line security/detect-object-injection
+                                      ...routeConfig[routeKey].props
+                                    };
+                                    return <Component {...updatedProps} />;
+                                  }}
+                                />
+                              );
+                            }}
+                          />
+                        </Container>
+                        <DarkModeToggle />
+                      </MUIThemeProvider>
+                    </StyledEngineProvider>
+                  </ThemeProvider>
                 </ConnectedLanguageProvider>
               </Provider>
             </ErrorBoundary>
