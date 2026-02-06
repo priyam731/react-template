@@ -30,6 +30,9 @@ jobs:
       - name: Test
         run: yarn test
 
+      - name: Clear Storybook cache
+        run: rm -rf node_modules/.cache/storybook
+
       - name: Accessibility tests using Storybook
         run: yarn playwright install && yarn test-storybook:ci
 
