@@ -11,6 +11,12 @@ import ConnectedLanguageProvider from '@containers/LanguageProvider';
 import { colors } from '@themes';
 import { ThemeProvider as CustomThemeProvider } from '@app/contexts/themeContext';
 
+// Clean up theme side effects between tests
+afterEach(() => {
+  localStorage.removeItem('theme');
+  document.documentElement.classList.remove('dark', 'light');
+});
+
 // Create a basic theme for testing
 const testTheme = createTheme({
   palette: {

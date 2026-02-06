@@ -9,7 +9,6 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { Switch, Route } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import { Router } from 'react-router';
 import { PersistGate } from 'redux-persist/integration/react';
 import { Provider } from 'react-redux';
@@ -75,7 +74,9 @@ function AppContent() {
   useEffect(() => {
     if (location.search.includes('?redirect_uri=')) {
       const routeToReplace = new URLSearchParams(location.search).get('redirect_uri');
-      history.replace(routeToReplace);
+      if (routeToReplace && routeToReplace.startsWith('/') && !routeToReplace.startsWith('//')) {
+        history.replace(routeToReplace);
+      }
     }
     const { store: s, persistor: p } = configureStore({}, history);
     setStore(s);
@@ -132,11 +133,6 @@ function AppContent() {
     </If>
   );
 }
-
-AppContent.propTypes = {
-  location: PropTypes.object,
-  history: PropTypes.object
-};
 
 /**
  * App wrapper component that provides theme context

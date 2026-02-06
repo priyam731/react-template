@@ -1,4 +1,4 @@
-import ReactDOM from 'react-dom';
+import ReactDOM, { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import enMessages from '../app/translations/en.json';
 
@@ -15,7 +15,9 @@ if (!ReactDOM.render) {
       root = createRoot(container);
       rootsMap.set(container, root);
     }
-    root.render(element);
+    flushSync(() => {
+      root.render(element);
+    });
     if (callback) {
       callback();
     }
