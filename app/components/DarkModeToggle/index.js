@@ -55,6 +55,7 @@ const IconWrapper = styled.div`
 `;
 
 // dark mode added
+// eslint-disable-next-line complexity
 export const DarkModeToggle = () => {
   const { isDarkMode, toggleTheme, colors } = useTheme();
   const [isAnimating, setIsAnimating] = React.useState(false);

@@ -88,19 +88,22 @@ export function App() {
                             ParentComponent={(props) => <Switch {...props} />}
                             of={map(Object.keys(routeConfig))}
                             renderItem={(routeKey, index) => {
+                              // Safe property access with validation
+                              if (!Object.prototype.hasOwnProperty.call(routeConfig, routeKey)) {
+                                return null;
+                              }
                               // eslint-disable-next-line security/detect-object-injection
-                              const Component = routeConfig[routeKey].component;
+                              const routeConfigItem = routeConfig[routeKey];
+                              const Component = routeConfigItem.component;
                               return (
                                 <Route
-                                  exact={routeConfig[routeKey].exact}
+                                  exact={routeConfigItem.exact}
                                   key={index}
-                                  // eslint-disable-next-line security/detect-object-injection
-                                  path={routeConfig[routeKey].route}
+                                  path={routeConfigItem.route}
                                   render={(props) => {
                                     const updatedProps = {
                                       ...props,
-                                      // eslint-disable-next-line security/detect-object-injection
-                                      ...routeConfig[routeKey].props
+                                      ...routeConfigItem.props
                                     };
                                     return <Component {...updatedProps} />;
                                   }}

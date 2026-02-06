@@ -21,8 +21,14 @@ export const formatTranslationMessages = (locale, messages) => {
   const defaultFormattedMessages =
     locale !== DEFAULT_LOCALE ? formatTranslationMessages(DEFAULT_LOCALE, enTranslationMessages) : {};
   const flattenFormattedMessages = (formattedMessages, key) => {
+    // Safe property access with hasOwnProperty check
+    const hasMessage = Object.prototype.hasOwnProperty.call(messages, key);
+    const hasDefaultMessage = Object.prototype.hasOwnProperty.call(defaultFormattedMessages, key);
+    // eslint-disable-next-line security/detect-object-injection
+    const messageValue = hasMessage ? messages[key] : undefined;
     const formattedMessage =
-      !messages[key] && locale !== DEFAULT_LOCALE ? defaultFormattedMessages[key] : messages[key];
+      // eslint-disable-next-line security/detect-object-injection
+      !messageValue && locale !== DEFAULT_LOCALE && hasDefaultMessage ? defaultFormattedMessages[key] : messageValue;
     return Object.assign(formattedMessages, { [key]: formattedMessage });
   };
   return Object.keys(messages).reduce(flattenFormattedMessages, {});

@@ -12,7 +12,12 @@ import routeConstants from '@utils/routeConstants';
 const ProtectedRoute = ({ render: C, isLoggedIn, handleLogout, ...rest }) => {
   const isUnprotectedRoute =
     Object.keys(routeConstants)
-      .filter((key) => !routeConstants[key].isProtected)
+      .filter((key) => {
+        // Safe property access with validation
+        // eslint-disable-next-line security/detect-object-injection
+        return Object.prototype.hasOwnProperty.call(routeConstants, key) && !routeConstants[key].isProtected;
+      })
+      // eslint-disable-next-line security/detect-object-injection
       .map((key) => routeConstants[key].route)
       .includes(rest.path) && rest.exact;
 
