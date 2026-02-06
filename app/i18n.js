@@ -21,11 +21,10 @@ export const formatTranslationMessages = (locale, messages) => {
   const defaultFormattedMessages =
     locale !== DEFAULT_LOCALE ? formatTranslationMessages(DEFAULT_LOCALE, enTranslationMessages) : {};
   const flattenFormattedMessages = (formattedMessages, key) => {
-    // Safe property access with hasOwnProperty check
-    const hasMessage = Object.prototype.hasOwnProperty.call(messages, key);
-    const hasDefaultMessage = Object.prototype.hasOwnProperty.call(defaultFormattedMessages, key);
+    // key comes from Object.keys(messages), so it's always an own property
     // eslint-disable-next-line security/detect-object-injection
-    const messageValue = hasMessage ? messages[key] : undefined;
+    const messageValue = messages[key];
+    const hasDefaultMessage = Object.prototype.hasOwnProperty.call(defaultFormattedMessages, key);
     const formattedMessage =
       // eslint-disable-next-line security/detect-object-injection
       !messageValue && locale !== DEFAULT_LOCALE && hasDefaultMessage ? defaultFormattedMessages[key] : messageValue;

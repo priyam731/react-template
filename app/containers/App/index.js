@@ -7,11 +7,10 @@
  *
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Switch, Route } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Router } from 'react-router';
-import map from 'lodash/map';
 import { PersistGate } from 'redux-persist/integration/react';
 import { Provider } from 'react-redux';
 import { CssBaseline, Container } from '@mui/material';
@@ -29,23 +28,9 @@ import { translationMessages } from '@app/i18n';
 import history from '@utils/history';
 import { SCREEN_BREAK_POINTS } from '@utils/constants';
 import configureStore from '@app/configureStore';
-import { colors } from '@themes';
-import { ThemeProvider } from '@app/contexts/themeContext';
+import { ThemeProvider, useTheme } from '@app/contexts/themeContext';
 import { DarkModeToggle } from '@app/components/DarkModeToggle';
 
-export const theme = createTheme({
-  palette: {
-    primary: {
-      main: colors.primary
-    },
-    secondary: {
-      main: colors.secondary
-    }
-  },
-  breakpoints: {
-    values: SCREEN_BREAK_POINTS
-  }
-});
 /**
  * App component that sets up the application with routing, theme, and language support.
  * It also handles redirect logic based on the query parameters in the URL.
@@ -54,9 +39,37 @@ export const theme = createTheme({
  *
  * @returns {JSX.Element} The App component with the application setup.
  */
-export function App() {
+function AppContent() {
   const [store, setStore] = useState(null);
   const [persistor, setPersistor] = useState(null);
+  const { colors: themeColors } = useTheme();
+
+  // Create MUI theme that responds to dark mode
+  const muiTheme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          primary: {
+            main: themeColors.primary
+          },
+          secondary: {
+            main: themeColors.secondary
+          },
+          background: {
+            default: themeColors.background,
+            paper: themeColors.surface
+          },
+          text: {
+            primary: themeColors.text,
+            secondary: themeColors.textSecondary
+          }
+        },
+        breakpoints: {
+          values: SCREEN_BREAK_POINTS
+        }
+      }),
+    [themeColors]
+  );
 
   const { location } = history;
   useEffect(() => {
@@ -77,45 +90,39 @@ export function App() {
             <ErrorBoundary>
               <Provider store={store}>
                 <ConnectedLanguageProvider messages={translationMessages}>
-                  <ThemeProvider>
-                    <StyledEngineProvider injectFirst>
-                      <MUIThemeProvider theme={theme}>
-                        <CssBaseline />
-                        <Global styles={globalStyles} />
-                        <Header />
-                        <Container>
-                          <For
-                            ParentComponent={(props) => <Switch {...props} />}
-                            of={map(Object.keys(routeConfig))}
-                            renderItem={(routeKey, index) => {
-                              // Safe property access with validation
-                              if (!Object.prototype.hasOwnProperty.call(routeConfig, routeKey)) {
-                                return null;
-                              }
-                              // eslint-disable-next-line security/detect-object-injection
-                              const routeConfigItem = routeConfig[routeKey];
-                              const Component = routeConfigItem.component;
-                              return (
-                                <Route
-                                  exact={routeConfigItem.exact}
-                                  key={index}
-                                  path={routeConfigItem.route}
-                                  render={(props) => {
-                                    const updatedProps = {
-                                      ...props,
-                                      ...routeConfigItem.props
-                                    };
-                                    return <Component {...updatedProps} />;
-                                  }}
-                                />
-                              );
-                            }}
-                          />
-                        </Container>
-                        <DarkModeToggle />
-                      </MUIThemeProvider>
-                    </StyledEngineProvider>
-                  </ThemeProvider>
+                  <StyledEngineProvider injectFirst>
+                    <MUIThemeProvider theme={muiTheme}>
+                      <CssBaseline />
+                      <Global styles={globalStyles} />
+                      <Header />
+                      <Container>
+                        <For
+                          ParentComponent={(props) => <Switch {...props} />}
+                          of={Object.keys(routeConfig)}
+                          renderItem={(routeKey) => {
+                            // eslint-disable-next-line security/detect-object-injection
+                            const routeConfigItem = routeConfig[routeKey];
+                            const Component = routeConfigItem.component;
+                            return (
+                              <Route
+                                exact={routeConfigItem.exact}
+                                key={routeKey}
+                                path={routeConfigItem.route}
+                                render={(props) => {
+                                  const updatedProps = {
+                                    ...props,
+                                    ...routeConfigItem.props
+                                  };
+                                  return <Component {...updatedProps} />;
+                                }}
+                              />
+                            );
+                          }}
+                        />
+                      </Container>
+                      <DarkModeToggle />
+                    </MUIThemeProvider>
+                  </StyledEngineProvider>
                 </ConnectedLanguageProvider>
               </Provider>
             </ErrorBoundary>
@@ -125,8 +132,22 @@ export function App() {
     </If>
   );
 }
-App.propTypes = {
+
+AppContent.propTypes = {
   location: PropTypes.object,
   history: PropTypes.object
 };
+
+/**
+ * App wrapper component that provides theme context
+ * @returns {JSX.Element} The App component wrapped in ThemeProvider
+ */
+export function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
+}
+
 export default App;

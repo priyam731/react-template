@@ -64,6 +64,7 @@ An enterprise react template application showcasing - Testing strategies, Global
   The app supports light and dark themes that can be toggled by the user. The selected theme preference is persisted in localStorage and automatically applied on subsequent visits.
 
   **Key Features:**
+
   - Toggle between light and dark themes
   - Theme preference saved in localStorage
   - Smooth theme transitions
@@ -72,19 +73,19 @@ An enterprise react template application showcasing - Testing strategies, Global
   Take a look at the following files:
 
   - [app/components/DarkModeToggle/index.js](app/components/DarkModeToggle/index.js) - Toggle button component
-  - [app/themes/index.js](app/themes/index.js) - Theme configuration with light and dark palettes
-  - [app/containers/App/index.js](app/containers/App/index.js) - Theme provider implementation
+  - [app/contexts/themeContext.js](app/contexts/themeContext.js) - Theme context with light and dark palettes
+  - [app/containers/App/index.js](app/containers/App/index.js) - Theme provider implementation and MUI theme integration
 
   **Usage:**
+
   ```jsx
-  import DarkModeToggle from '@components/DarkModeToggle';
-  
+  import { DarkModeToggle } from '@components/DarkModeToggle';
+
   // Place the toggle button anywhere in your app
-  <DarkModeToggle />
+  <DarkModeToggle />;
   ```
 
-  The theme state is managed using React's `useState` and Material-UI's `ThemeProvider`. Theme changes are automatically applied across all components using the theme configuration.
-
+  The theme state is managed using React Context (ThemeContext) with localStorage persistence. Material-UI's ThemeProvider receives a dynamically generated theme object that updates when dark mode is toggled, ensuring all MUI components respond to theme changes.
 
 ## Global state management using reduxSauce
 
